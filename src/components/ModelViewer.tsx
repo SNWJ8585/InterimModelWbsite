@@ -8,6 +8,7 @@ import { ModelStats, TelemetrySettings } from '../types';
 
 interface ModelProps {
   url: string;
+  fallbackUrl?: string;
   onLoaded: () => void;
   onError?: (reason: string) => void;
   stats?: ModelStats;
@@ -85,7 +86,7 @@ const ErrorDisplay = ({ message }: { message: string }) => {
 };
 
 class ModelErrorBoundary extends React.Component<
-  { children: React.ReactNode; onError: (error: string) => void },
+  { children: React.ReactNode; onError: (error: string) => void; resetKey?: string },
   { hasError: boolean; errorMessage: string }
 > {
   constructor(props: any) {
@@ -99,6 +100,12 @@ class ModelErrorBoundary extends React.Component<
 
   componentDidCatch(error: any) {
     this.props.onError(this.state.errorMessage);
+  }
+
+  componentDidUpdate(prevProps: Readonly<{ children: React.ReactNode; onError: (error: string) => void; resetKey?: string }>) {
+    if (prevProps.resetKey !== this.props.resetKey && this.state.hasError) {
+      this.setState({ hasError: false, errorMessage: "" });
+    }
   }
 
   render() {
@@ -276,7 +283,32 @@ const Placeholder = ({ text, onLoaded }: { text: string; onLoaded: () => void })
   );
 };
 
-export default function ModelViewer({ url, onLoaded, onError, stats, showStats, settings }: ModelProps) {
+export default function ModelViewer({ url, fallbackUrl, onLoaded, onError, stats, showStats, settings }: ModelProps) {
+  const [activeUrl, setActiveUrl] = React.useState(url);
+  const [didFallback, setDidFallback] = React.useState(false);
+  const debugEnabled = React.useMemo(() => {
+    try {
+      return new URLSearchParams(window.location.search).has('debug');
+    } catch {
+      return false;
+    }
+  }, []);
+
+  React.useEffect(() => {
+    setActiveUrl(url);
+    setDidFallback(false);
+  }, [url]);
+
+  const handleBoundaryError = React.useCallback((msg: string) => {
+    const hasFallback = !!fallbackUrl && fallbackUrl !== '' && fallbackUrl !== activeUrl;
+    if (!didFallback && hasFallback) {
+      setDidFallback(true);
+      setActiveUrl(fallbackUrl!);
+      return;
+    }
+    onError?.(msg);
+  }, [activeUrl, didFallback, fallbackUrl, onError]);
+
   return (
     <div className="w-full h-full relative bg-transparent">
       <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
@@ -318,15 +350,24 @@ export default function ModelViewer({ url, onLoaded, onError, stats, showStats, 
         
         <Suspense fallback={<ModelLoadingIndicator />}>
           <Environment preset="city" />
-          <ModelErrorBoundary onError={onError || (() => {})}>
+          <ModelErrorBoundary onError={handleBoundaryError} resetKey={activeUrl}>
             <group position={[0, -0.6, 0]}>
-              {url ? (
-                <FBXModel url={url} onLoaded={onLoaded} stats={stats} showStats={showStats} settings={settings} onError={onError} />
+              {activeUrl ? (
+                <FBXModel url={activeUrl} onLoaded={onLoaded} stats={stats} showStats={showStats} settings={settings} onError={onError} />
               ) : (
                 <Placeholder text="No Model" onLoaded={() => {}} />
               )}
             </group>
           </ModelErrorBoundary>
+
+          {debugEnabled && (
+            <Html fullscreen>
+              <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-white/10 bg-black/50 px-3 py-2 font-mono text-[10px] text-white/70">
+                <div>source: {activeUrl || '(empty)'}</div>
+                <div>fallback: {didFallback ? 'yes' : 'no'}</div>
+              </div>
+            </Html>
+          )}
           <ContactShadows 
             resolution={1024} 
             scale={20} 

@@ -20,6 +20,10 @@ export interface SlotConfig {
   title: string;
   description: string;
   modelPath: string;
+  /**
+   * Local (same-origin) fallback model URL. Not intended to be persisted to Firestore.
+   */
+  fallbackUrl?: string;
   stats?: ModelStats;
   url: string | null;
   type: 'fbx' | null;

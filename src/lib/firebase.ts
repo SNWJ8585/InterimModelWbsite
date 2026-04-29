@@ -85,7 +85,8 @@ export async function getSlots(): Promise<SlotConfig[]> {
 export async function updateSlot(slot: SlotConfig) {
   const path = `slots/${slot.id}`;
   try {
-    const { id, ...data } = slot; // Extract id so we don't save it as a field if we don't want to, but keep it if we do
+    // Avoid persisting local-only properties.
+    const { id, fallbackUrl, ...data } = slot;
     await setDoc(doc(db, 'slots', slot.id), {
       ...data,
       updatedAt: serverTimestamp()

@@ -23,6 +23,7 @@ export default function App() {
       title: 'Neural Pivot 01',
       description: 'Early structural adaptation stage; neural connections are being established.',
       modelPath: '/models/NO2FBX.fbx',
+      fallbackUrl: '/models/NO2FBX.fbx',
       stats: {
         gender: 'Female',
         age: 28,
@@ -40,6 +41,7 @@ export default function App() {
       title: 'Neural Pivot 02',
       description: 'Secondary refinement and growth; system stability improves.',
       modelPath: '/models/NO4FBX.fbx',
+      fallbackUrl: '/models/NO4FBX.fbx',
       stats: {
         gender: 'Male',
         age: 32,
@@ -57,6 +59,7 @@ export default function App() {
       title: 'Neural Pivot 03',
       description: 'Integration peak; the neural network reaches high synergy.',
       modelPath: '/models/NO5FBX.fbx',
+      fallbackUrl: '/models/NO5FBX.fbx',
       stats: {
         gender: 'Female',
         age: 38,
@@ -74,6 +77,7 @@ export default function App() {
       title: 'Neural Pivot 04',
       description: 'Framework stabilizes; the system enters long-term operation.',
       modelPath: '/models/NO8FBX.fbx',
+      fallbackUrl: '/models/NO8FBX.fbx',
       stats: {
         gender: 'Male',
         age: 45,
@@ -91,6 +95,7 @@ export default function App() {
       title: 'Neural Pivot 05',
       description: 'Long-term balance and accumulated experience yield high stability.',
       modelPath: '/models/NO9FBX.fbx',
+      fallbackUrl: '/models/NO9FBX.fbx',
       stats: {
         gender: 'Female',
         age: 55,
@@ -131,18 +136,19 @@ export default function App() {
             console.log(`🔗 Slot ${s.id} Link: "${rawPath}" -> "${remotePath}"`);
             
             // Only update if remote has data, or keep local default
-            nextSlots[index] = {
-              ...existing,
-              title: s.title || existing.title,
-              description: s.description || existing.description,
-              modelPath: rawPath, // Allow clearing by taking the raw value
-              // If we have a blob (local upload), keep it. 
-              // Otherwise, take the remotePath (normalized). 
-              // This allows clearing if rawPath/remotePath is empty.
-              url: (existing.url && existing.url.startsWith('blob:')) ? existing.url : remotePath,
-              stats: s.stats ? { ...existing.stats, ...s.stats } : existing.stats,
-              type: s.type || existing.type || 'fbx'
-            };
+              nextSlots[index] = {
+                ...existing,
+                title: s.title || existing.title,
+                description: s.description || existing.description,
+                modelPath: rawPath, // Allow clearing by taking the raw value
+                fallbackUrl: existing.fallbackUrl || existing.url || existing.modelPath,
+                // If we have a blob (local upload), keep it. 
+                // Otherwise, take the remotePath (normalized). 
+                // This allows clearing if rawPath/remotePath is empty.
+                url: (existing.url && existing.url.startsWith('blob:')) ? existing.url : remotePath,
+                stats: s.stats ? { ...existing.stats, ...s.stats } : existing.stats,
+                type: s.type || existing.type || 'fbx'
+              };
           }
         });
         return nextSlots;
@@ -281,14 +287,15 @@ export default function App() {
     <main className="relative w-screen h-screen overflow-hidden">
       {/* 3D Scene */}
       <div className="absolute inset-0">
-        <ModelViewer 
-          url={currentSlotPayload.url || ''} 
-          onLoaded={handleModelLoaded}
-          onError={handleModelError}
-          stats={currentSlotPayload.stats}
-          showStats={isStatsVisible}
-          settings={telemetrySettings}
-        />
+          <ModelViewer 
+            url={currentSlotPayload.url || ''} 
+            fallbackUrl={currentSlotPayload.fallbackUrl || ''}
+            onLoaded={handleModelLoaded}
+            onError={handleModelError}
+            stats={currentSlotPayload.stats}
+            showStats={isStatsVisible}
+            settings={telemetrySettings}
+          />
       </div>
 
       {/* UI Overlay */}
