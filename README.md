@@ -1,20 +1,33 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Interim Model Website
 
-# Run and deploy your AI Studio app
+This repository is prepared for deployment as a Render static site.
 
-This contains everything you need to run your app locally.
+## Local development
 
-View your app in AI Studio: https://ai.studio/apps/4dd5b383-4584-4071-922d-5d0a1a323366
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+Prerequisite: Node.js
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+2. Start the dev server:
    `npm run dev`
+3. Open:
+   `http://localhost:5173/`
+
+## Deploy to Render
+
+This repo now includes [render.yaml](./render.yaml) for Render Blueprint/static-site deployment.
+
+Recommended settings:
+
+1. Create a new Static Site in Render or sync the included Blueprint.
+2. Use the repository root as the app root.
+3. Build command:
+   `npm install && npm run build`
+4. Publish directory:
+   `dist`
+
+Notes:
+
+- The site is configured to serve as a static SPA with a rewrite to `/index.html`.
+- Model files in `public/models/` are published with the app and should load from same-origin paths such as `/models/NO2FBX.fbx`.
+- External Google Fonts have been removed so first load does not depend on `fonts.googleapis.com`.
