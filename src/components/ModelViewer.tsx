@@ -286,6 +286,7 @@ const Placeholder = ({ text, onLoaded }: { text: string; onLoaded: () => void })
 export default function ModelViewer({ url, fallbackUrl, onLoaded, onError, stats, showStats, settings }: ModelProps) {
   const [activeUrl, setActiveUrl] = React.useState(url);
   const [didFallback, setDidFallback] = React.useState(false);
+  const timeoutRef = React.useRef<number | null>(null);
   const debugEnabled = React.useMemo(() => {
     try {
       return new URLSearchParams(window.location.search).has('debug');
@@ -298,6 +299,29 @@ export default function ModelViewer({ url, fallbackUrl, onLoaded, onError, stats
     setActiveUrl(url);
     setDidFallback(false);
   }, [url]);
+
+  // If the chosen URL stalls (common when a domain is blocked), fall back after a short timeout.
+  React.useEffect(() => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    const hasFallback = !!fallbackUrl && fallbackUrl !== '' && fallbackUrl !== activeUrl;
+    if (!activeUrl || didFallback || !hasFallback) return;
+
+    timeoutRef.current = window.setTimeout(() => {
+      setDidFallback(true);
+      setActiveUrl(fallbackUrl!);
+    }, 8000);
+
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [activeUrl, didFallback, fallbackUrl]);
 
   const handleBoundaryError = React.useCallback((msg: string) => {
     const hasFallback = !!fallbackUrl && fallbackUrl !== '' && fallbackUrl !== activeUrl;

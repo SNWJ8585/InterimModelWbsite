@@ -136,6 +136,12 @@ export default function App() {
             console.log(`🔗 Slot ${s.id} Link: "${rawPath}" -> "${remotePath}"`);
             
             // Only update if remote has data, or keep local default
+              const shouldKeepLocal =
+                typeof existing.url === 'string' &&
+                existing.url.startsWith('/models/') &&
+                typeof remotePath === 'string' &&
+                remotePath.startsWith('http');
+
               nextSlots[index] = {
                 ...existing,
                 title: s.title || existing.title,
@@ -145,7 +151,7 @@ export default function App() {
                 // If we have a blob (local upload), keep it. 
                 // Otherwise, take the remotePath (normalized). 
                 // This allows clearing if rawPath/remotePath is empty.
-                url: (existing.url && existing.url.startsWith('blob:')) ? existing.url : remotePath,
+                url: (existing.url && existing.url.startsWith('blob:')) ? existing.url : (shouldKeepLocal ? existing.url : remotePath),
                 stats: s.stats ? { ...existing.stats, ...s.stats } : existing.stats,
                 type: s.type || existing.type || 'fbx'
               };

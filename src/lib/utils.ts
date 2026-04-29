@@ -21,10 +21,8 @@ export function normalizeUrl(url: string): string {
   // Examples:
   // - https://raw.githubusercontent.com/<u>/<r>/<b>/public/models/X.fbx
   // - https://github.com/<u>/<r>/blob/<b>/public/models/X.fbx
-  const publicModelsMatch = processed.match(/\/public\/models\/([^/?#]+)$/);
-  if (publicModelsMatch) {
-    return `/models/${publicModelsMatch[1]}`;
-  }
+  const publicModelsMatch = processed.match(/\/public\/models\/([^/?#]+\.(?:fbx|glb|gltf))(?:[?#].*)?$/i);
+  if (publicModelsMatch) return `/models/${publicModelsMatch[1]}`;
 
   // Handle GitHub links
   if (processed.includes('github.com')) {
