@@ -101,7 +101,9 @@ export function subscribeToSlots(callback: (slots: SlotConfig[]) => void) {
     const slots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SlotConfig));
     callback(slots);
   }, (error) => {
-    handleFirestoreError(error, OperationType.GET, path);
+    // Don't throw from async snapshot callbacks. In networks where Google services are blocked,
+    // throwing here can break the whole app and prevent local models from loading.
+    console.error('Firebase snapshot error:', error);
   });
 }
 
