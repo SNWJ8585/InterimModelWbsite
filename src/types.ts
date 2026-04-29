@@ -23,4 +23,5 @@ export interface SlotConfig {
   stats?: ModelStats;
   url: string | null;
   type: 'fbx' | null;
+  updatedAt?: any;
 }

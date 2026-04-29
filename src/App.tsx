@@ -9,6 +9,7 @@ import UIOverlay from './components/UIOverlay';
 import { subscribeToSlots, auth, googleProvider, testConnection, uploadModel, updateSlot } from './lib/firebase';
 import { signInWithPopup, onAuthStateChanged, User } from 'firebase/auth';
 import { SlotConfig, ModelStats, TelemetrySettings } from './types';
+import { normalizeUrl } from './lib/utils';
 
 export default function App() {
   const [selectedSlot, setSelectedSlot] = useState<number>(1);
@@ -111,21 +112,40 @@ export default function App() {
   useEffect(() => {
     testConnection();
     const unsubscribe = subscribeToSlots((fbSlots) => {
+      console.log(`📡 Neural Uplink: Received ${fbSlots.length} components.`);
       setSlots(prevSlots => {
-        const newSlots = [...prevSlots];
+        const nextSlots = [...prevSlots];
         fbSlots.forEach(s => {
-          const index = parseInt(s.id) - 1;
-          if (index >= 0 && index < 5) {
-            // Keep local upload url if it exists, otherwise use remote
-            newSlots[index] = { 
-              ...newSlots[index],
-              url: newSlots[index].url || s.modelPath,
-              title: s.title || newSlots[index].title,
-              // Merge stats if they come from firebase, though they are usually fixed in App.tsx
+          // Identify slot index (0-4)
+          let index = nextSlots.findIndex(slot => slot.id === s.id);
+          if (index === -1) {
+            const numericId = s.id.match(/\d+/)?.[0];
+            if (numericId) index = parseInt(numericId) - 1;
+          }
+          
+          if (index >= 0 && index < nextSlots.length) {
+            const existing = nextSlots[index];
+            const rawPath = s.modelPath || '';
+            const remotePath = normalizeUrl(rawPath);
+            
+            console.log(`🔗 Slot ${s.id} Link: "${rawPath}" -> "${remotePath}"`);
+            
+            // Only update if remote has data, or keep local default
+            nextSlots[index] = {
+              ...existing,
+              title: s.title || existing.title,
+              description: s.description || existing.description,
+              modelPath: rawPath, // Allow clearing by taking the raw value
+              // If we have a blob (local upload), keep it. 
+              // Otherwise, take the remotePath (normalized). 
+              // This allows clearing if rawPath/remotePath is empty.
+              url: (existing.url && existing.url.startsWith('blob:')) ? existing.url : remotePath,
+              stats: s.stats ? { ...existing.stats, ...s.stats } : existing.stats,
+              type: s.type || existing.type || 'fbx'
             };
           }
         });
-        return newSlots;
+        return nextSlots;
       });
     });
 

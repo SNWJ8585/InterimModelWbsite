@@ -15,24 +15,57 @@ interface ModelProps {
   settings: TelemetrySettings;
 }
 
-const ErrorDisplay = ({ message }: { message: string }) => (
-  <Html center>
-    <div className="bg-red-500/20 backdrop-blur-xl border border-red-500/40 p-6 rounded-2xl text-center max-w-xs shadow-2xl">
-      <div className="w-12 h-12 bg-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
-        <Activity className="text-red-400 w-6 h-6" />
+const ErrorDisplay = ({ message }: { message: string }) => {
+  const isGithubError = message.includes('github.com') || message.includes('raw.githubusercontent.com');
+  const is404 = message.includes('404');
+
+  return (
+    <Html center>
+      <div className="bg-red-950/80 backdrop-blur-2xl border border-red-500/50 p-8 rounded-3xl text-center max-w-sm shadow-[0_0_50px_rgba(239,68,68,0.2)]">
+        <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20 animate-pulse">
+          <Activity className="text-red-400 w-8 h-8" />
+        </div>
+        <h3 className="text-white font-black text-sm uppercase tracking-[0.3em] mb-4">Neural Map unreachable</h3>
+        
+        <div className="space-y-4 mb-6 text-left">
+          <p className="text-red-200/90 text-xs leading-relaxed">
+            {is404 
+              ? "The system encountered a 404 error at the specified path." 
+              : "Authentication or connection failure during neural fetch."}
+          </p>
+          
+          {isGithubError && is404 && (
+            <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-2">
+              <p className="text-[10px] text-white/60 uppercase font-bold tracking-wider">Neural Troubleshooting:</p>
+              <ul className="text-[10px] text-red-200/60 list-disc pl-4 space-y-2">
+                <li>Repo Visibility: Must be <span className="text-red-300 font-bold underline">Public</span></li>
+                <li>Branch Check: Is it <span className="text-red-300">master</span> instead of <span className="text-red-300">main</span>?</li>
+                <li>Path Integrity: Do not omit "public" if it's in your GitHub path</li>
+                <li>Case Check: <span className="text-red-300">.fbx</span> vs <span className="text-red-300">.FBX</span> must match exactly</li>
+                <li>URL Source: Use the "Raw" button on GitHub to verify the link works in a browser</li>
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <div className="text-[9px] font-mono text-white/30 bg-black/40 p-2.5 rounded-lg border border-white/5 break-all max-h-24 overflow-y-auto mb-4">
+          {message}
+        </div>
+
+        {is404 && (
+          <a 
+            href={message.split(': ').pop()?.trim()} 
+            target="_blank" 
+            referrerPolicy="no-referrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 rounded-xl text-[10px] text-red-200 font-bold uppercase tracking-widest transition-all"
+          >
+            Open RAW link to verify
+          </a>
+        )}
       </div>
-      <h3 className="text-white font-black text-xs uppercase tracking-widest mb-2">Model Link Failure</h3>
-      <p className="text-red-200/70 text-[10px] leading-relaxed mb-4">
-        {message.includes('404') 
-          ? "The requested neural map was not found. Please upload the .fbx file named exactly as shown below to the project's models folder."
-          : message}
-      </p>
-      <div className="text-[10px] font-mono text-white/40 bg-black/20 p-2 rounded border border-white/5 break-all">
-        MISSING_FILE: {message.split('/').pop()?.split('?')[0] || "Unknown"}
-      </div>
-    </div>
-  </Html>
-);
+    </Html>
+  );
+};
 
 class ModelErrorBoundary extends React.Component<
   { children: React.ReactNode; onError: (error: string) => void },
@@ -121,30 +154,42 @@ const TelemetryLabel = ({ label, value, position, settings }: { label: string; v
   );
 };
 
-const FBXModel = ({ url, onLoaded, stats, showStats, settings }: { url: string; onLoaded: () => void; stats?: ModelStats; showStats?: boolean; settings: TelemetrySettings }) => {
+const ModelLoadingIndicator = () => (
+  <Html center>
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-[#a8a2e1]/20 border-t-[#a8a2e1] rounded-full animate-spin" />
+      <span className="text-[10px] font-black text-[#a8a2e1] uppercase tracking-[0.2em] animate-pulse">
+        Synchronizing...
+      </span>
+    </div>
+  </Html>
+);
+
+const FBXModel = ({ url, onLoaded, stats, showStats, settings, onError }: { url: string; onLoaded: () => void; stats?: ModelStats; showStats?: boolean; settings: TelemetrySettings; onError?: (msg: string) => void }) => {
+  if (!url || url === '') return null;
+  
   const fbx = useFBX(url);
   
-  // Normalize model scale and offset on load to ensure consistent display
   const { model, normalization } = React.useMemo(() => {
+    if (!fbx) return { model: null, normalization: { scale: 1, offset: [0, 0, 0] as [number, number, number] } };
     const cloned = fbx.clone();
     
-    // Compute bounding box
     const box = new THREE.Box3().setFromObject(cloned);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
     
-    // Target height around 2.4 units for a standard human scale framing
-    const targetScale = 2.4 / (size.y || 1);
+    // Safety check for size
+    const height = size.y || 1;
+    const targetScale = 2.4 / height;
     
     return {
       model: cloned,
       normalization: {
-        scale: targetScale,
+        scale: isFinite(targetScale) ? targetScale : 1,
         offset: [
-          -center.x * targetScale,
-          -box.min.y * targetScale, // Stand precisely on the ground plane
-          -center.z * targetScale
+          -center.x * (isFinite(targetScale) ? targetScale : 1),
+          -box.min.y * (isFinite(targetScale) ? targetScale : 1),
+          -center.z * (isFinite(targetScale) ? targetScale : 1)
         ] as [number, number, number]
       }
     };
@@ -254,11 +299,12 @@ export default function ModelViewer({ url, onLoaded, onError, stats, showStats, 
         {/* Top Down tight light */}
         <pointLight position={[0, 12, 0]} intensity={1.5} distance={25} />
         
-        <Suspense fallback={null}>
+        <Suspense fallback={<ModelLoadingIndicator />}>
+          <Environment preset="city" />
           <ModelErrorBoundary onError={onError || (() => {})}>
             <group position={[0, -0.6, 0]}>
               {url ? (
-                <FBXModel url={url} onLoaded={onLoaded} stats={stats} showStats={showStats} settings={settings} />
+                <FBXModel url={url} onLoaded={onLoaded} stats={stats} showStats={showStats} settings={settings} onError={onError} />
               ) : (
                 <Placeholder text="No Model" onLoaded={() => {}} />
               )}

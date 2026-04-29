@@ -7,6 +7,7 @@ import {
 import { User as FirebaseUser } from 'firebase/auth';
 import { updateSlot } from '../lib/firebase';
 import { SlotConfig, TelemetrySettings } from '../types';
+import { normalizeUrl } from '../lib/utils';
 
 interface UIOverlayProps {
   onFileUpload: (file: File) => void;
@@ -279,22 +280,18 @@ export default function UIOverlay({
                 whileHover={{ scale: 1.02, backgroundColor: "rgba(168, 162, 225, 0.6)" }}
                 whileTap={{ scale: 0.98 }}
                 onClick={async () => {
-                  let path = (document.getElementById(`settings-path-${selectedSlot}`) as HTMLInputElement)?.value;
-                  if (path && path.includes('github.com') && path.includes('/blob/')) {
-                    path = path.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-                  }
+                  const inputPath = (document.getElementById(`settings-path-${selectedSlot}`) as HTMLInputElement)?.value;
+                  // Store raw path in Firestore, normalization happens in App.tsx loader
+                  const path = inputPath?.trim() || '';
                   
                   if (!user) {
-                    // Temporarily apply locally if not logged in
-                    const newSlot = { ...currentSlot, modelPath: path || currentSlot.modelPath, url: path || currentSlot.url };
-                    // Since we can't easily update the parent state from here without a prop, 
-                    // we show an alert or use the updateSlot which might fail.
-                    alert('Login to save permanently. Link updated for session.');
+                    const normalized = normalizeUrl(path);
+                    alert('Login to save permanently. Link preview updated.');
                     return;
                   }
 
                   try {
-                    await updateSlot({ ...currentSlot, modelPath: path || currentSlot.modelPath });
+                    await updateSlot({ ...currentSlot, modelPath: path });
                     alert('Data Uplink Success.');
                   } catch (e) {
                     alert('Uplink Refused (Check permissions).');
@@ -349,18 +346,14 @@ export default function UIOverlay({
               whileTap={{ scale: 0.98 }}
               onClick={async () => {
                 const title = (document.getElementById(`slot-title-${selectedSlot}`) as HTMLInputElement)?.value;
-                let path = (document.getElementById(`slot-path-${selectedSlot}`) as HTMLInputElement)?.value;
-                
-                // Helper to convert typical GitHub blob URLs to raw content URLs
-                if (path && path.includes('github.com') && path.includes('/blob/')) {
-                  path = path.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-                }
+                const inputPath = (document.getElementById(`slot-path-${selectedSlot}`) as HTMLInputElement)?.value;
+                const path = inputPath?.trim() || '';
 
                 try {
                   await updateSlot({
                     ...currentSlot,
                     title: title || currentSlot.title,
-                    modelPath: path || currentSlot.modelPath
+                    modelPath: path
                   });
                   alert('Synched to Reality.');
                 } catch (e) {

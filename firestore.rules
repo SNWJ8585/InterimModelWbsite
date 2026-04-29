@@ -10,7 +10,11 @@ service cloud.firestore {
     }
 
     function isOwner() {
-      return isSignedIn() && (request.auth.token.email == 'snwj8585@gmail.com' || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+      return isSignedIn() && (
+        request.auth.token.email == 'snwj8585@gmail.com' || 
+        request.auth.uid == '2MZy1HTRP5hp58wIcHmPFR5uVTB2' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
     }
 
     function isValidId(id) {
@@ -20,7 +24,7 @@ service cloud.firestore {
     function isValidSlot(data) {
       return data.keys().hasAll(['title', 'modelPath', 'updatedAt']) &&
              data.title is string && data.title.size() <= 100 &&
-             data.modelPath is string && data.modelPath.size() <= 500 &&
+             data.modelPath is string && data.modelPath.size() <= 1000 &&
              data.updatedAt == request.time;
     }
 
