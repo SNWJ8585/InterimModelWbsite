@@ -102,14 +102,33 @@ const TelemetryLabel = ({ label, value, position, settings }: { label: string; v
 
 const FBXModel = ({ url, onLoaded, stats, showStats, settings }: { url: string; onLoaded: () => void; stats?: ModelStats; showStats?: boolean; settings: TelemetrySettings }) => {
   const fbx = useFBX(url);
-  // Clone to avoid mutating the shared cache object
-  const model = React.useMemo(() => fbx.clone(), [fbx]);
   
-  const [normalization, setNormalization] = React.useState<{
-    scale: number;
-    offset: [number, number, number];
-  }>({ scale: 1, offset: [0, 0, 0] });
-
+  // Normalize model scale and offset on load to ensure consistent display
+  const { model, normalization } = React.useMemo(() => {
+    const cloned = fbx.clone();
+    
+    // Compute bounding box
+    const box = new THREE.Box3().setFromObject(cloned);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    
+    // Target height around 2.5 units to fill view nicely at dist=6, fov=30
+    const targetScale = 2.8 / (maxDim || 1);
+    
+    return {
+      model: cloned,
+      normalization: {
+        scale: targetScale,
+        offset: [
+          -center.x * targetScale,
+          -box.min.y * targetScale, // Stand on the ground
+          -center.z * targetScale
+        ] as [number, number, number]
+      }
+    };
+  }, [fbx]);
+  
   // Memoize stat positions relative to normalized scale
   const telemetryPoints = useMemo(() => {
     if (!stats) return [];
@@ -135,29 +154,8 @@ const FBXModel = ({ url, onLoaded, stats, showStats, settings }: { url: string; 
         mesh.material = CLAY_MATERIAL;
       }
     });
-  }, [model]);
-
-  // Calculate scaling and centering ONCE when model changes
-  React.useEffect(() => {
-    if (model) {
-      const box = new THREE.Box3().setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      
-      const targetScale = 1.2 / (maxDim || 1);
-      
-      setNormalization({
-        scale: targetScale,
-        offset: [
-          -center.x * targetScale,
-          -box.min.y * targetScale, 
-          -center.z * targetScale
-        ]
-      });
-      
-      onLoaded();
-    }
+    // Trigger onLoaded after material and initial state is ready
+    onLoaded();
   }, [model, onLoaded]);
 
   return (
