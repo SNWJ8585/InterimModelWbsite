@@ -159,7 +159,7 @@ const ModelLoadingIndicator = () => (
     <div className="flex flex-col items-center gap-4">
       <div className="w-12 h-12 border-4 border-[#a8a2e1]/20 border-t-[#a8a2e1] rounded-full animate-spin" />
       <span className="text-[10px] font-black text-[#a8a2e1] uppercase tracking-[0.2em] animate-pulse">
-        Synchronizing...
+        同步中...
       </span>
     </div>
   </Html>
@@ -202,12 +202,12 @@ const FBXModel = ({ url, onLoaded, stats, showStats, settings, onError }: { url:
     const spread = settings.spread;
     const height = settings.height;
     return [
-      { id: 'gender', label: 'Identity', value: stats.gender, pos: [-0.8 * spread, 2.2 * height, 0.4 * spread] }, // Near head
-      { id: 'age', label: 'Chronology', value: stats.age.toString(), pos: [0.8 * spread, 2.0 * height, -0.4 * spread] }, // Near shoulder
-      { id: 'mentality', label: 'Mentality', value: stats.mentality.final.split(/[\s\n(]/)[0], pos: [1.0 * spread, 1.5 * height, 0.6 * spread] }, // Mid torso
-      { id: 'direction', label: 'Direction', value: stats.direction.final.split(/[\s\n(]/)[0], pos: [-1.1 * spread, 1.3 * height, -0.7 * spread] }, // Waist
-      { id: 'motivation', label: 'Motivation', value: stats.motivation.final.split(/[\s\n(]/)[0], pos: [0.9 * spread, 0.8 * height, 0.8 * spread] }, // Hips/Thighs
-      { id: 'social', label: 'Social', value: stats.social.final.split(/[\s\n(]/)[0], pos: [-0.8 * spread, 0.4 * height, 0.5 * spread] }, // Knees
+      { id: 'gender', label: '性别倾向', value: stats.gender, pos: [-0.8 * spread, 2.2 * height, 0.4 * spread] }, // 头部附近
+      { id: 'age', label: '生理周期', value: stats.age.toString(), pos: [0.8 * spread, 2.0 * height, -0.4 * spread] }, // 肩部附近
+      { id: 'mentality', label: '核心意识', value: stats.mentality.final.split(/[\s\n(]/)[0], pos: [1.0 * spread, 1.5 * height, 0.6 * spread] }, // 胸部
+      { id: 'direction', label: '处理方向', value: stats.direction.final.split(/[\s\n(]/)[0], pos: [-1.1 * spread, 1.3 * height, -0.7 * spread] }, // 腰部
+      { id: 'motivation', label: '核心动力', value: stats.motivation.final.split(/[\s\n(]/)[0], pos: [0.9 * spread, 0.8 * height, 0.8 * spread] }, // 胯部
+      { id: 'social', label: '社交熵', value: stats.social.final.split(/[\s\n(]/)[0], pos: [-0.8 * spread, 0.4 * height, 0.5 * spread] }, // 膝盖
     ];
   }, [stats, settings.spread, settings.height]);
 

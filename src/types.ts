@@ -1,6 +1,6 @@
 
 export interface ModelStats {
-  gender: 'Female' | 'Male';
+  gender: string;
   age: number;
   mentality: { initial: string; final: string };
   direction: { initial: string; final: string };

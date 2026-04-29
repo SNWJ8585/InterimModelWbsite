@@ -61,8 +61,23 @@ export default function UIOverlay({
     <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-10 select-none z-10">
       {/* Top Header */}
       <div className="flex justify-between items-start">
-        <div className="flex flex-col gap-1">
-          {/* Top-left header contents removed */}
+        <div className="flex flex-col gap-2">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            key={`header-${selectedSlot}`}
+            className="flex flex-col gap-1"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-[#a8a2e1] rounded-full" />
+              <h1 className="text-3xl font-black text-white uppercase tracking-tighter drop-shadow-2xl">
+                {currentSlot.title}
+              </h1>
+            </div>
+            <p className="max-w-md text-xs font-medium text-white/40 leading-relaxed pl-5">
+              {currentSlot.description}
+            </p>
+          </motion.div>
         </div>
 
         {/* Action Buttons */}
@@ -89,7 +104,7 @@ export default function UIOverlay({
                 if (isAdminPanelOpen) setIsAdminPanelOpen(false);
               }}
               className={`p-3 backdrop-blur-md rounded-xl border shadow-xl transition-colors ${isSettingsOpen ? 'bg-[#a8a2e1]/40 border-[#a8a2e1]/60' : 'bg-white/5 border-white/10 opacity-80'}`}
-              title="Telemetry Display Controls"
+              title="遥测显示控制"
             >
               <Settings className={`w-5 h-5 ${isSettingsOpen ? 'text-white' : 'text-white/60'}`} />
             </motion.button>
@@ -99,7 +114,7 @@ export default function UIOverlay({
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsStatsVisible(!isStatsVisible)}
               className={`p-3 backdrop-blur-md rounded-xl border shadow-xl transition-colors ${isStatsVisible ? 'bg-white/20 border-white/40' : 'bg-white/5 border-white/10 opacity-60'}`}
-              title={isStatsVisible ? "Hide Telemetry" : "Show Telemetry"}
+              title={isStatsVisible ? "隐藏遥测" : "显示遥测"}
             >
               <Activity className={`w-5 h-5 ${isStatsVisible ? 'text-white' : 'text-white/40'}`} />
             </motion.button>
@@ -117,7 +132,7 @@ export default function UIOverlay({
                 ) : (
                   <LogIn className="w-4 h-4" />
                 )}
-                {isLoginInProgress ? 'Checking...' : 'Login'}
+                {isLoginInProgress ? '检查中...' : '登录'}
               </motion.button>
             ) : (
               <div className="flex gap-2">
@@ -129,7 +144,7 @@ export default function UIOverlay({
                     if (isSettingsOpen) setIsSettingsOpen(false);
                   }}
                   className={`p-3 backdrop-blur-md rounded-xl border shadow-xl transition-colors ${isAdminPanelOpen ? 'bg-purple-600/40 border-purple-400' : 'bg-white/10 border-white/20'}`}
-                  title="Override Control"
+                  title="管理面板"
                 >
                   <Users className="w-5 h-5 text-white" />
                 </motion.button>
@@ -138,6 +153,7 @@ export default function UIOverlay({
                   whileTap={{ scale: 0.9 }}
                   onClick={() => fileInputRef.current?.click()}
                   className="p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl border border-white/20 shadow-xl"
+                  title="上传模型"
                 >
                   <Upload className="w-5 h-5 text-white" />
                 </motion.button>
@@ -153,7 +169,7 @@ export default function UIOverlay({
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             {user && (
-              <span className="text-[10px] text-white/40 font-mono">OPERATOR: {user.uid.slice(0, 8)}</span>
+              <span className="text-[10px] text-white/40 font-mono">操作员: {user.uid.slice(0, 8)}</span>
             )}
           </motion.div>
         </motion.div>
@@ -183,15 +199,15 @@ export default function UIOverlay({
           >
             <div className="flex justify-between items-center">
               <div className="flex flex-col">
-                <span className="font-black text-[#a8a2e1] uppercase tracking-widest text-[10px]">Telemetry settings</span>
-                <span className="text-[10px] text-white/40 uppercase tracking-[0.2em]">Visual Fine-tuning</span>
+                <span className="font-black text-[#a8a2e1] uppercase tracking-widest text-[10px]">遥测设置</span>
+                <span className="text-[10px] text-white/40 uppercase tracking-[0.2em]">视觉微调</span>
               </div>
               <button onClick={() => setIsSettingsOpen(false)} className="text-white/40 hover:text-white font-bold">×</button>
             </div>
 
             <div className="flex flex-col gap-5">
               <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Data Concentricity</label>
+                <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">数据集中度</label>
                 <span className="text-[11px] font-mono text-[#a8a2e1] font-bold">{Math.round(telemetrySettings.spread * 100)}%</span>
               </div>
               <div className="relative h-6 flex items-center px-1">
@@ -206,14 +222,14 @@ export default function UIOverlay({
                 />
               </div>
               <div className="flex justify-between px-2 text-[8px] text-white/20 font-black uppercase tracking-tighter">
-                <span>Centralized</span>
-                <span>Expanded</span>
+                <span>集中</span>
+                <span>分散</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-5">
               <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Vertical Offset</label>
+                <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">垂直偏移</label>
                 <span className="text-[11px] font-mono text-[#a8a2e1] font-bold">{Math.round(telemetrySettings.height * 100)}%</span>
               </div>
               <div className="relative h-6 flex items-center px-1">
@@ -228,14 +244,14 @@ export default function UIOverlay({
                 />
               </div>
               <div className="flex justify-between px-2 text-[8px] text-white/20 font-black uppercase tracking-tighter">
-                <span>Compressed</span>
-                <span>Elevated</span>
+                <span>压缩</span>
+                <span>提升</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-5">
               <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Label Calibration</label>
+                <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">标注缩放</label>
                 <span className="text-[11px] font-mono text-[#a8a2e1] font-bold">{Math.round(telemetrySettings.fontSize * 100)}%</span>
               </div>
               <div className="relative h-6 flex items-center px-1">
@@ -250,29 +266,29 @@ export default function UIOverlay({
                 />
               </div>
               <div className="flex justify-between px-2 text-[8px] text-white/20 font-black uppercase tracking-tighter">
-                <span>Minimal</span>
-                <span>Maximum</span>
+                <span>最小</span>
+                <span>最大</span>
               </div>
             </div>
 
             <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Info className="w-3 h-3 text-[#a8a2e1]" />
-                <span className="text-[9px] font-bold text-white/60 uppercase tracking-widest">Observation Note</span>
+                <span className="text-[9px] font-bold text-white/60 uppercase tracking-widest">观测提示</span>
               </div>
               <p className="text-[9px] leading-relaxed text-white/40 font-medium">
-                Adjusting concentricity changes the gravitational bias of data points relative to the model core.
+                调整集中度会改变数据点相对于模型核心的重力偏好。
               </p>
             </div>
 
             <div className="pt-4 border-t border-white/10 flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Remote Model URI</label>
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">远程模型 URI</label>
                 <input 
                   id={`settings-path-${selectedSlot}`}
                   key={`settings-path-${selectedSlot}`}
                   defaultValue={currentSlot.modelPath}
-                  placeholder="https://raw.githubusercontent.com/..."
+                  placeholder="请输入 fbx 直连链接或本地路径..."
                   className="w-full px-4 py-3 bg-white/10 rounded-xl font-mono text-[10px] text-white focus:outline-none focus:ring-1 focus:ring-[#a8a2e1]/40 border border-white/5"
                 />
               </div>
@@ -281,26 +297,24 @@ export default function UIOverlay({
                 whileTap={{ scale: 0.98 }}
                 onClick={async () => {
                   const inputPath = (document.getElementById(`settings-path-${selectedSlot}`) as HTMLInputElement)?.value;
-                  // Store raw path in Firestore, normalization happens in App.tsx loader
                   const path = inputPath?.trim() || '';
                   
                   if (!user) {
-                    const normalized = normalizeUrl(path);
-                    alert('Login to save permanently. Link preview updated.');
+                    alert('请先登录以永久保存。链接预览已更新（仅限本次会话）。');
                     return;
                   }
 
                   try {
                     await updateSlot({ ...currentSlot, modelPath: path });
-                    alert('Data Uplink Success.');
+                    alert('数据上行成功。');
                   } catch (e) {
-                    alert('Uplink Refused (Check permissions).');
+                    alert('上行被拒绝（权限不足）。');
                   }
                 }}
                 className="w-full py-3 bg-[#a8a2e1]/40 hover:bg-[#a8a2e1]/60 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-colors border border-[#a8a2e1]/30"
               >
                 <Save className="w-4 h-4" />
-                Apply URI Override
+                应用 URI 覆盖
               </motion.button>
             </div>
           </motion.div>
@@ -316,12 +330,12 @@ export default function UIOverlay({
             className="absolute top-24 right-10 w-80 bg-white/95 backdrop-blur-2xl rounded-3xl p-8 shadow-2xl pointer-events-auto border border-white/20 flex flex-col gap-6"
           >
             <div className="flex justify-between items-center text-slate-800">
-              <span className="font-black text-[#a8a2e1] uppercase tracking-widest text-xs">Slot {selectedSlot} Override</span>
+              <span className="font-black text-[#a8a2e1] uppercase tracking-widest text-xs">槽位 {selectedSlot} 数据管理</span>
               <button onClick={() => setIsAdminPanelOpen(false)} className="text-slate-400 hover:text-slate-600 font-bold">×</button>
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Title Mask</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">名称</label>
               <input 
                 id={`slot-title-${selectedSlot}`}
                 defaultValue={currentSlot.title}
@@ -330,7 +344,7 @@ export default function UIOverlay({
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Source URI (.fbx / URL)</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">源 URI (.fbx 链接或本地路径)</label>
               <input 
                 id={`slot-path-${selectedSlot}`}
                 key={`path-${selectedSlot}-${currentSlot.modelPath}`}
@@ -338,7 +352,6 @@ export default function UIOverlay({
                 placeholder="https://example.com/model.fbx"
                 className="w-full px-5 py-3 bg-slate-100 rounded-xl font-mono text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#a8a2e1]/20"
               />
-              <span className="text-[9px] text-slate-400 italic px-1">Tip: Paste a direct URL if Firebase Storage is disabled.</span>
             </div>
 
             <motion.button
@@ -355,15 +368,15 @@ export default function UIOverlay({
                     title: title || currentSlot.title,
                     modelPath: path
                   });
-                  alert('Synched to Reality.');
+                  alert('同步到云端成功。');
                 } catch (e) {
-                  alert('Authorization Failure.');
+                  alert('授权失败。');
                 }
               }}
               className="mt-2 w-full py-4 bg-[#a8a2e1] hover:bg-[#9790d1] text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
             >
               <Save className="w-5 h-5" />
-              Commit Changes
+              提交修改
             </motion.button>
           </motion.div>
         )}
@@ -374,8 +387,7 @@ export default function UIOverlay({
         {allSlots.map((slot, index) => {
           const slotNum = index + 1;
           const isActive = selectedSlot === slotNum;
-          // Use first word of poetic name or just Slot X
-          const shortTitle = slot.title?.split(' ')[0] || `Entity ${slotNum}`;
+          const shortTitle = slot.title || `主体 ${slotNum}`;
           
           return (
             <motion.button
@@ -390,7 +402,7 @@ export default function UIOverlay({
                 }`}
             >
               <span className={`text-[8px] font-black uppercase tracking-[.2em] ${isActive ? 'text-[#a8a2e1]' : 'text-white/30'}`}>
-                R{slotNum}
+                项目 {slotNum}
               </span>
               <span className={`text-xs font-black truncate max-w-[100px] ${isActive ? 'text-slate-900' : 'text-white'}`}>
                 {shortTitle}
@@ -418,7 +430,7 @@ export default function UIOverlay({
             {isLoading && !error && (
               <div className="px-8 py-5 bg-white/95 backdrop-blur-2xl text-slate-900 rounded-[2rem] shadow-3xl flex items-center gap-4 border border-white/40">
                 <RotateCw className="w-5 h-5 animate-spin text-[#a8a2e1]" />
-                <span className="text-xs font-black uppercase tracking-[0.2em]">Materializing Sub-Space...</span>
+                <span className="text-xs font-black uppercase tracking-[0.2em]">主体物质化中...</span>
               </div>
             )}
           </motion.div>

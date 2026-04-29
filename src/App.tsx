@@ -18,87 +18,87 @@ export default function App() {
   const [slots, setSlots] = useState<SlotConfig[]>([
     { 
       id: '1',
-      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO2FBX.fbx'), 
+      url: '/models/NO2FBX.fbx', 
       type: 'fbx', 
-      title: 'Neural Pivot 01',
-      description: 'The first stage of intense structural adaptation.',
-      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO2FBX.fbx',
+      title: '神经枢轴 01',
+      description: '初期结构适应阶段，神经连接正在初步构建。',
+      modelPath: '/models/NO2FBX.fbx',
       stats: {
-        gender: 'Female',
+        gender: '女',
         age: 28,
         mentality: { initial: '0.1', final: '0.4' },
         direction: { initial: '0.5', final: '0.8' },
         motivation: { initial: '0.6', final: '0.9' },
         social: { initial: '0.2', final: '0.5' },
-        description: 'Model NO2FBX - Initial Adaptation Phase'
+        description: '模型 NO2FBX - 初始适应期'
       }
     },
     { 
       id: '2',
-      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO4FBX.fbx'), 
+      url: '/models/NO4FBX.fbx', 
       type: 'fbx', 
-      title: 'Neural Pivot 02',
-      description: 'Secondary structural refinement and growth.',
-      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO4FBX.fbx',
+      title: '神经枢轴 02',
+      description: '二级结构细化与增长，系统稳定性提升。',
+      modelPath: '/models/NO4FBX.fbx',
       stats: {
-        gender: 'Male',
+        gender: '男',
         age: 32,
         mentality: { initial: '0.3', final: '0.6' },
         direction: { initial: '0.4', final: '0.7' },
         motivation: { initial: '0.5', final: '0.8' },
         social: { initial: '0.3', final: '0.6' },
-        description: 'Model NO4FBX - Refinement Stage'
+        description: '模型 NO4FBX - 精炼阶段'
       }
     },
     { 
       id: '3',
-      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO5FBX.fbx'), 
+      url: '/models/NO5FBX.fbx', 
       type: 'fbx', 
-      title: 'Neural Pivot 03',
-      description: 'The peak of structural integration.',
-      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO5FBX.fbx',
+      title: '神经枢轴 03',
+      description: '结构整合的峰值，神经网络达到高度协同。',
+      modelPath: '/models/NO5FBX.fbx',
       stats: {
-        gender: 'Female',
+        gender: '女',
         age: 38,
         mentality: { initial: '0.5', final: '0.8' },
         direction: { initial: '0.6', final: '0.9' },
         motivation: { initial: '0.7', final: '0.95' },
         social: { initial: '0.5', final: '0.75' },
-        description: 'Model NO5FBX - Peak Integration'
+        description: '模型 NO5FBX - 整合峰值期'
       }
     },
     { 
       id: '4',
-      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO8FBX.fbx'), 
+      url: '/models/NO8FBX.fbx', 
       type: 'fbx', 
-      title: 'Neural Pivot 04',
-      description: 'Stabilizing the neural framework.',
-      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO8FBX.fbx',
+      title: '神经枢轴 04',
+      description: '神经框架趋于稳定，系统进入长期运行状态。',
+      modelPath: '/models/NO8FBX.fbx',
       stats: {
-        gender: 'Male',
+        gender: '男',
         age: 45,
         mentality: { initial: '0.7', final: '0.9' },
         direction: { initial: '0.8', final: '0.95' },
         motivation: { initial: '0.6', final: '0.8' },
         social: { initial: '0.7', final: '0.85' },
-        description: 'Model NO8FBX - Framework Stabilization'
+        description: '模型 NO8FBX - 框架巩固期'
       }
     },
     { 
       id: '5',
-      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO9FBX.fbx'), 
+      url: '/models/NO9FBX.fbx', 
       type: 'fbx', 
-      title: 'Neural Pivot 05',
-      description: 'Long-term equilibrium and seasoned stability.',
-      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO9FBX.fbx',
+      title: '神经枢轴 05',
+      description: '长期平衡与经验沉淀完成，达到高阶稳定性。',
+      modelPath: '/models/NO9FBX.fbx',
       stats: {
-        gender: 'Female',
+        gender: '女',
         age: 55,
         mentality: { initial: '0.85', final: '0.98' },
         direction: { initial: '0.9', final: '1.0' },
         motivation: { initial: '0.5', final: '0.7' },
         social: { initial: '0.8', final: '0.95' },
-        description: 'Model NO9FBX - Mature Equilibrium'
+        description: '模型 NO9FBX - 成熟平衡期'
       }
     },
   ]);
