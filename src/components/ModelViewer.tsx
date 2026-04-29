@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useRef } from 'react';
+﻿import React, { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, useFBX, PerspectiveCamera, Html, Float } from '@react-three/drei';
 import * as THREE from 'three';
@@ -18,6 +18,11 @@ interface ModelProps {
 const ErrorDisplay = ({ message }: { message: string }) => {
   const isGithubError = message.includes('github.com') || message.includes('raw.githubusercontent.com');
   const is404 = message.includes('404');
+  const isFbxParseError =
+    message.includes('FBXLoader') &&
+    (message.includes('Unknown property type') ||
+      message.includes('Unable to parse') ||
+      message.includes('Invalid file format'));
 
   return (
     <Html center>
@@ -33,6 +38,18 @@ const ErrorDisplay = ({ message }: { message: string }) => {
               ? "The system encountered a 404 error at the specified path." 
               : "Authentication or connection failure during neural fetch."}
           </p>
+          
+          {isFbxParseError && (
+            <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-2">
+              <p className="text-[10px] text-white/60 uppercase font-bold tracking-wider">FBX Parse Troubleshooting:</p>
+              <ul className="text-[10px] text-red-200/60 list-disc pl-4 space-y-2">
+                <li>FBX 解析失败通常表示文件已损坏或不是 Raw 二进制内容</li>
+                <li>请重新导出/重新下载 .fbx（不要用 GitHub “blob” 页面链接）</li>
+                <li>若来自 GitHub：必须使用 Raw 链接，且仓库为 Public</li>
+                <li>建议优先使用 glTF/GLB（更稳定，体积更小）</li>
+              </ul>
+            </div>
+          )}
           
           {isGithubError && is404 && (
             <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-2">
@@ -159,7 +176,7 @@ const ModelLoadingIndicator = () => (
     <div className="flex flex-col items-center gap-4">
       <div className="w-12 h-12 border-4 border-[#a8a2e1]/20 border-t-[#a8a2e1] rounded-full animate-spin" />
       <span className="text-[10px] font-black text-[#a8a2e1] uppercase tracking-[0.2em] animate-pulse">
-        同步中...
+        鍚屾涓?..
       </span>
     </div>
   </Html>
@@ -202,12 +219,12 @@ const FBXModel = ({ url, onLoaded, stats, showStats, settings, onError }: { url:
     const spread = settings.spread;
     const height = settings.height;
     return [
-      { id: 'gender', label: '性别倾向', value: stats.gender, pos: [-0.8 * spread, 2.2 * height, 0.4 * spread] }, // 头部附近
-      { id: 'age', label: '生理周期', value: stats.age.toString(), pos: [0.8 * spread, 2.0 * height, -0.4 * spread] }, // 肩部附近
-      { id: 'mentality', label: '核心意识', value: stats.mentality.final.split(/[\s\n(]/)[0], pos: [1.0 * spread, 1.5 * height, 0.6 * spread] }, // 胸部
-      { id: 'direction', label: '处理方向', value: stats.direction.final.split(/[\s\n(]/)[0], pos: [-1.1 * spread, 1.3 * height, -0.7 * spread] }, // 腰部
-      { id: 'motivation', label: '核心动力', value: stats.motivation.final.split(/[\s\n(]/)[0], pos: [0.9 * spread, 0.8 * height, 0.8 * spread] }, // 胯部
-      { id: 'social', label: '社交熵', value: stats.social.final.split(/[\s\n(]/)[0], pos: [-0.8 * spread, 0.4 * height, 0.5 * spread] }, // 膝盖
+      { id: 'gender', label: '鎬у埆鍊惧悜', value: stats.gender, pos: [-0.8 * spread, 2.2 * height, 0.4 * spread] }, // 澶撮儴闄勮繎
+      { id: 'age', label: '鐢熺悊鍛ㄦ湡', value: stats.age.toString(), pos: [0.8 * spread, 2.0 * height, -0.4 * spread] }, // 鑲╅儴闄勮繎
+      { id: 'mentality', label: '鏍稿績鎰忚瘑', value: stats.mentality.final.split(/[\s\n(]/)[0], pos: [1.0 * spread, 1.5 * height, 0.6 * spread] }, // 鑳搁儴
+      { id: 'direction', label: '澶勭悊鏂瑰悜', value: stats.direction.final.split(/[\s\n(]/)[0], pos: [-1.1 * spread, 1.3 * height, -0.7 * spread] }, // 鑵伴儴
+      { id: 'motivation', label: '鏍稿績鍔ㄥ姏', value: stats.motivation.final.split(/[\s\n(]/)[0], pos: [0.9 * spread, 0.8 * height, 0.8 * spread] }, // 鑳儴
+      { id: 'social', label: '社交倾向', value: stats.social.final.split(/[\\s\\n(]/)[0], pos: [-0.8 * spread, 0.4 * height, 0.5 * spread] }, // 膝盖
     ];
   }, [stats, settings.spread, settings.height]);
 

@@ -1,0 +1,4 @@
+*.fbx -text
+*.fbx binary
+*.glb -text
+*.glb binary
