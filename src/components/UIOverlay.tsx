@@ -1,9 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, MapPin, Circle, User, Upload, RotateCw, Play, LogIn, 
-  Settings, Save, ChevronRight, Activity, TrendingUp, Compass, 
-  Users, Info 
+  Settings, Upload, RotateCw, LogIn, 
+  Save, Activity, Users, Info 
 } from 'lucide-react';
 import { User as FirebaseUser } from 'firebase/auth';
 import { updateSlot } from '../lib/firebase';
@@ -47,6 +46,7 @@ export default function UIOverlay({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -61,34 +61,25 @@ export default function UIOverlay({
       {/* Top Header */}
       <div className="flex justify-between items-start">
         <div className="flex flex-col gap-1">
-          <motion.h1 
-            key={currentSlot.title}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-5xl font-black tracking-tighter text-[#eae6ff] mix-blend-overlay opacity-80"
-          >
-            {currentSlot.title?.toUpperCase() || 'GAP STUDY'}
-          </motion.h1>
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] whitespace-nowrap">Observation State:</span>
-            <span className="text-[10px] font-bold text-[#a8a2e1] uppercase tracking-[0.3em] whitespace-nowrap">
-              {stats?.description || 'Unknown Variable'}
-            </span>
-            <motion.button 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setSelectedSlot(selectedSlot >= 5 ? 1 : selectedSlot + 1)}
-              className="ml-2 p-2 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 text-white pointer-events-auto"
-              title="Next Rift"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </motion.button>
-          </div>
+          {/* Top-left header contents removed */}
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col gap-3 pointer-events-auto items-end">
-          <div className="flex gap-2">
+        <motion.div 
+          className="flex flex-col gap-3 pointer-events-auto items-end group"
+          initial={false}
+          onMouseEnter={() => setIsHeaderHovered(true)}
+          onMouseLeave={() => setIsHeaderHovered(false)}
+        >
+          <motion.div 
+            animate={{ 
+              opacity: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 1 : 0,
+              x: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 0 : 20,
+              scale: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 1 : 0.95
+            }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            className="flex gap-2"
+          >
             <motion.button 
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -151,11 +142,20 @@ export default function UIOverlay({
                 </motion.button>
               </div>
             )}
-          </div>
-          {user && (
-            <span className="text-[10px] text-white/40 font-mono">OPERATOR: {user.uid.slice(0, 8)}</span>
-          )}
-        </div>
+          </motion.div>
+          
+          <motion.div
+            animate={{ 
+              opacity: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 1 : 0,
+              y: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 0 : 5
+            }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            {user && (
+              <span className="text-[10px] text-white/40 font-mono">OPERATOR: {user.uid.slice(0, 8)}</span>
+            )}
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Middle Content - Stats removed from here, moving to 3D */}
