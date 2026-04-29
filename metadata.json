@@ -1,0 +1,6 @@
+{
+  "name": "Lumina 3D Viewer",
+  "description": "A high-fidelity 3D model viewer for FBX and Alembic files with a minimalist lilac aesthetic.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["3D Rendering", "File Interactivity"]
+}

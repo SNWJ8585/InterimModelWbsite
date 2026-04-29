@@ -1,0 +1,22 @@
+{
+  "entities": {
+    "SlotConfig": {
+      "title": "Slot Configuration",
+      "description": "Metadata for each model slot",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Display name of the model" },
+        "description": { "type": "string", "description": "Brief info about the model" },
+        "modelPath": { "type": "string", "description": "URL or path to the .fbx file" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "modelPath"]
+    }
+  },
+  "firestore": {
+    "slots": {
+      "schema": "SlotConfig",
+      "description": "Configuration for the 5 slots"
+    }
+  }
+}
