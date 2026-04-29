@@ -15,25 +15,46 @@ interface ModelProps {
   settings: TelemetrySettings;
 }
 
+const ErrorDisplay = ({ message }: { message: string }) => (
+  <Html center>
+    <div className="bg-red-500/20 backdrop-blur-xl border border-red-500/40 p-6 rounded-2xl text-center max-w-xs shadow-2xl">
+      <div className="w-12 h-12 bg-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+        <Activity className="text-red-400 w-6 h-6" />
+      </div>
+      <h3 className="text-white font-black text-xs uppercase tracking-widest mb-2">Model Link Failure</h3>
+      <p className="text-red-200/70 text-[10px] leading-relaxed mb-4">
+        {message.includes('404') 
+          ? "The requested neural map was not found. Please upload the .fbx file named exactly as shown below to the project's models folder."
+          : message}
+      </p>
+      <div className="text-[10px] font-mono text-white/40 bg-black/20 p-2 rounded border border-white/5 break-all">
+        MISSING_FILE: {message.split('/').pop()?.split('?')[0] || "Unknown"}
+      </div>
+    </div>
+  </Html>
+);
+
 class ModelErrorBoundary extends React.Component<
   { children: React.ReactNode; onError: (error: string) => void },
-  { hasError: boolean }
+  { hasError: boolean; errorMessage: string }
 > {
   constructor(props: any) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, errorMessage: "" };
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, errorMessage: error?.message || "Internal Load Failure" };
   }
 
   componentDidCatch(error: any) {
-    this.props.onError(error?.message || "An error occurred while loading the 3D model.");
+    this.props.onError(this.state.errorMessage);
   }
 
   render() {
-    if (this.state.hasError) return null;
+    if (this.state.hasError) {
+      return <ErrorDisplay message={this.state.errorMessage} />;
+    }
     return this.props.children;
   }
 }
@@ -113,8 +134,8 @@ const FBXModel = ({ url, onLoaded, stats, showStats, settings }: { url: string; 
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
     
-    // Target height around 2.5 units to fill view nicely at dist=6, fov=30
-    const targetScale = 2.8 / (maxDim || 1);
+    // Target height around 2.4 units for a standard human scale framing
+    const targetScale = 2.4 / (size.y || 1);
     
     return {
       model: cloned,
@@ -122,7 +143,7 @@ const FBXModel = ({ url, onLoaded, stats, showStats, settings }: { url: string; 
         scale: targetScale,
         offset: [
           -center.x * targetScale,
-          -box.min.y * targetScale, // Stand on the ground
+          -box.min.y * targetScale, // Stand precisely on the ground plane
           -center.z * targetScale
         ] as [number, number, number]
       }
@@ -130,17 +151,18 @@ const FBXModel = ({ url, onLoaded, stats, showStats, settings }: { url: string; 
   }, [fbx]);
   
   // Memoize stat positions relative to normalized scale
+  // Based on a target height of ~2.4 units
   const telemetryPoints = useMemo(() => {
     if (!stats) return [];
     const spread = settings.spread;
     const height = settings.height;
     return [
-      { id: 'gender', label: 'Identity', value: stats.gender, pos: [-6.5 * spread, 8.2 * height, 4.5 * spread] },
-      { id: 'age', label: 'Chronology', value: stats.age.toString(), pos: [6.2 * spread, 8.5 * height, -6.0 * spread] },
-      { id: 'mentality', label: 'Mentality', value: stats.mentality.final.split(/[\s\n(]/)[0], pos: [7.5 * spread, 6.2 * height, 6.5 * spread] },
-      { id: 'direction', label: 'Direction', value: stats.direction.final.split(/[\s\n(]/)[0], pos: [-7.8 * spread, 6.8 * height, -9.0 * spread] },
-      { id: 'motivation', label: 'Motivation', value: stats.motivation.final.split(/[\s\n(]/)[0], pos: [7.2 * spread, 4.5 * height, 9.0 * spread] },
-      { id: 'social', label: 'Social', value: stats.social.final.split(/[\s\n(]/)[0], pos: [-7.0 * spread, 4.0 * height, 5.2 * spread] },
+      { id: 'gender', label: 'Identity', value: stats.gender, pos: [-0.8 * spread, 2.2 * height, 0.4 * spread] }, // Near head
+      { id: 'age', label: 'Chronology', value: stats.age.toString(), pos: [0.8 * spread, 2.0 * height, -0.4 * spread] }, // Near shoulder
+      { id: 'mentality', label: 'Mentality', value: stats.mentality.final.split(/[\s\n(]/)[0], pos: [1.0 * spread, 1.5 * height, 0.6 * spread] }, // Mid torso
+      { id: 'direction', label: 'Direction', value: stats.direction.final.split(/[\s\n(]/)[0], pos: [-1.1 * spread, 1.3 * height, -0.7 * spread] }, // Waist
+      { id: 'motivation', label: 'Motivation', value: stats.motivation.final.split(/[\s\n(]/)[0], pos: [0.9 * spread, 0.8 * height, 0.8 * spread] }, // Hips/Thighs
+      { id: 'social', label: 'Social', value: stats.social.final.split(/[\s\n(]/)[0], pos: [-0.8 * spread, 0.4 * height, 0.5 * spread] }, // Knees
     ];
   }, [stats, settings.spread, settings.height]);
 
@@ -159,8 +181,10 @@ const FBXModel = ({ url, onLoaded, stats, showStats, settings }: { url: string; 
   }, [model, onLoaded]);
 
   return (
-    <group scale={normalization.scale} position={normalization.offset}>
-      <primitive object={model} />
+    <group>
+      <group scale={normalization.scale} position={normalization.offset}>
+        <primitive object={model} />
+      </group>
       
       <AnimatePresence>
         {showStats && telemetryPoints.map((point) => (

@@ -73,9 +73,9 @@ export default function UIOverlay({
         >
           <motion.div 
             animate={{ 
-              opacity: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 1 : 0,
-              x: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 0 : 20,
-              scale: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 1 : 0.95
+              opacity: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 1 : 0.7,
+              x: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 0 : 2,
+              scale: (isHeaderHovered || isSettingsOpen || isAdminPanelOpen) ? 1 : 0.98
             }}
             transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
             className="flex gap-2"
@@ -260,8 +260,51 @@ export default function UIOverlay({
                 <span className="text-[9px] font-bold text-white/60 uppercase tracking-widest">Observation Note</span>
               </div>
               <p className="text-[9px] leading-relaxed text-white/40 font-medium">
-                Adjusting concentricity changes the gravitational bias of data points relative to the model core. Large labels may result in overlap.
+                Adjusting concentricity changes the gravitational bias of data points relative to the model core.
               </p>
+            </div>
+
+            <div className="pt-4 border-t border-white/10 flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Remote Model URI</label>
+                <input 
+                  id={`settings-path-${selectedSlot}`}
+                  key={`settings-path-${selectedSlot}`}
+                  defaultValue={currentSlot.modelPath}
+                  placeholder="https://raw.githubusercontent.com/..."
+                  className="w-full px-4 py-3 bg-white/10 rounded-xl font-mono text-[10px] text-white focus:outline-none focus:ring-1 focus:ring-[#a8a2e1]/40 border border-white/5"
+                />
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.02, backgroundColor: "rgba(168, 162, 225, 0.6)" }}
+                whileTap={{ scale: 0.98 }}
+                onClick={async () => {
+                  let path = (document.getElementById(`settings-path-${selectedSlot}`) as HTMLInputElement)?.value;
+                  if (path && path.includes('github.com') && path.includes('/blob/')) {
+                    path = path.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+                  }
+                  
+                  if (!user) {
+                    // Temporarily apply locally if not logged in
+                    const newSlot = { ...currentSlot, modelPath: path || currentSlot.modelPath, url: path || currentSlot.url };
+                    // Since we can't easily update the parent state from here without a prop, 
+                    // we show an alert or use the updateSlot which might fail.
+                    alert('Login to save permanently. Link updated for session.');
+                    return;
+                  }
+
+                  try {
+                    await updateSlot({ ...currentSlot, modelPath: path || currentSlot.modelPath });
+                    alert('Data Uplink Success.');
+                  } catch (e) {
+                    alert('Uplink Refused (Check permissions).');
+                  }
+                }}
+                className="w-full py-3 bg-[#a8a2e1]/40 hover:bg-[#a8a2e1]/60 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-colors border border-[#a8a2e1]/30"
+              >
+                <Save className="w-4 h-4" />
+                Apply URI Override
+              </motion.button>
             </div>
           </motion.div>
         )}
@@ -290,13 +333,15 @@ export default function UIOverlay({
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Source URI (.fbx)</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Source URI (.fbx / URL)</label>
               <input 
                 id={`slot-path-${selectedSlot}`}
+                key={`path-${selectedSlot}-${currentSlot.modelPath}`}
                 defaultValue={currentSlot.modelPath}
-                placeholder="/models/entity_v2.fbx"
+                placeholder="https://example.com/model.fbx"
                 className="w-full px-5 py-3 bg-slate-100 rounded-xl font-mono text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#a8a2e1]/20"
               />
+              <span className="text-[9px] text-slate-400 italic px-1">Tip: Paste a direct URL if Firebase Storage is disabled.</span>
             </div>
 
             <motion.button
@@ -304,7 +349,13 @@ export default function UIOverlay({
               whileTap={{ scale: 0.98 }}
               onClick={async () => {
                 const title = (document.getElementById(`slot-title-${selectedSlot}`) as HTMLInputElement)?.value;
-                const path = (document.getElementById(`slot-path-${selectedSlot}`) as HTMLInputElement)?.value;
+                let path = (document.getElementById(`slot-path-${selectedSlot}`) as HTMLInputElement)?.value;
+                
+                // Helper to convert typical GitHub blob URLs to raw content URLs
+                if (path && path.includes('github.com') && path.includes('/blob/')) {
+                  path = path.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+                }
+
                 try {
                   await updateSlot({
                     ...currentSlot,

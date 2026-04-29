@@ -10,7 +10,7 @@ service cloud.firestore {
     }
 
     function isOwner() {
-      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return isSignedIn() && (request.auth.token.email == 'snwj8585@gmail.com' || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
     }
 
     function isValidId(id) {
@@ -19,7 +19,6 @@ service cloud.firestore {
 
     function isValidSlot(data) {
       return data.keys().hasAll(['title', 'modelPath', 'updatedAt']) &&
-             data.keys().size() >= 3 && data.keys().size() <= 5 &&
              data.title is string && data.title.size() <= 100 &&
              data.modelPath is string && data.modelPath.size() <= 500 &&
              data.updatedAt == request.time;

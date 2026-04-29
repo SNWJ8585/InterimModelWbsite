@@ -6,7 +6,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ModelViewer from './components/ModelViewer';
 import UIOverlay from './components/UIOverlay';
-import { subscribeToSlots, auth, googleProvider, testConnection } from './lib/firebase';
+import { subscribeToSlots, auth, googleProvider, testConnection, uploadModel, updateSlot } from './lib/firebase';
 import { signInWithPopup, onAuthStateChanged, User } from 'firebase/auth';
 import { SlotConfig, ModelStats, TelemetrySettings } from './types';
 
@@ -17,87 +17,87 @@ export default function App() {
   const [slots, setSlots] = useState<SlotConfig[]>([
     { 
       id: '1',
-      url: null, 
+      url: '', 
       type: 'fbx', 
-      title: 'Pressure Pivot',
-      description: 'The moment of intense structural adaptation.',
+      title: 'Neural Pivot 01',
+      description: 'The first stage of intense structural adaptation.',
       modelPath: '',
       stats: {
         gender: 'Female',
-        age: 34,
-        mentality: { initial: '-0.1', final: '0.1' },
-        direction: { initial: '0.75', final: '1.0' },
-        motivation: { initial: '0.4', final: '0.8' },
-        social: { initial: '-0.3', final: '-0.1' },
-        description: 'High Pressure Turning Point'
+        age: 28,
+        mentality: { initial: '0.1', final: '0.4' },
+        direction: { initial: '0.5', final: '0.8' },
+        motivation: { initial: '0.6', final: '0.9' },
+        social: { initial: '0.2', final: '0.5' },
+        description: 'Initial Adaptation Phase'
       }
     },
     { 
       id: '2',
-      url: null, 
+      url: '', 
       type: 'fbx', 
-      title: 'Crisis Threshold',
-      description: 'Navigating the shadowed boundary of mid-life.',
+      title: 'Neural Pivot 02',
+      description: 'Secondary structural refinement and growth.',
       modelPath: '',
       stats: {
         gender: 'Male',
-        age: 36,
-        mentality: { initial: '-0.45', final: '-0.2' },
-        direction: { initial: '0.85', final: '-0.4' },
-        motivation: { initial: '0.2', final: '-0.2' },
-        social: { initial: '-0.5', final: '-0.2' },
-        description: 'Early Mid-life Crisis'
+        age: 32,
+        mentality: { initial: '0.3', final: '0.6' },
+        direction: { initial: '0.4', final: '0.7' },
+        motivation: { initial: '0.5', final: '0.8' },
+        social: { initial: '0.3', final: '0.6' },
+        description: 'Refinement Stage'
       }
     },
     { 
       id: '3',
-      url: null, 
+      url: '', 
       type: 'fbx', 
-      title: 'Resilient Core',
-      description: 'The foundation of central strength and stability.',
+      title: 'Neural Pivot 03',
+      description: 'The peak of structural integration.',
       modelPath: '',
       stats: {
         gender: 'Female',
-        age: 42,
-        mentality: { initial: '0.55', final: '0.9' },
-        direction: { initial: '0.9', final: '1.0' },
-        motivation: { initial: '0.6', final: '0.6' },
-        social: { initial: '0.45', final: '0.5' },
-        description: 'Backbone Strength'
+        age: 38,
+        mentality: { initial: '0.5', final: '0.8' },
+        direction: { initial: '0.6', final: '0.9' },
+        motivation: { initial: '0.7', final: '0.95' },
+        social: { initial: '0.5', final: '0.75' },
+        description: 'Peak Integration'
       }
     },
     { 
       id: '4',
-      url: null, 
+      url: '', 
       type: 'fbx', 
-      title: 'Golden Horizon',
-      description: 'Transitioning towards a state of seasoned equilibrium.',
+      title: 'Neural Pivot 04',
+      description: 'Stabilizing the neural framework.',
       modelPath: '',
       stats: {
         gender: 'Male',
-        age: 58,
-        mentality: { initial: '0.75', final: '0.85' },
-        direction: { initial: '0.5', final: '1.0' },
-        motivation: { initial: '0.4', final: '0.6' },
-        social: { initial: '0.65', final: '0.7' },
-        description: 'Pre-retirement Transition'
+        age: 45,
+        mentality: { initial: '0.7', final: '0.9' },
+        direction: { initial: '0.8', final: '0.95' },
+        motivation: { initial: '0.6', final: '0.8' },
+        social: { initial: '0.7', final: '0.85' },
+        description: 'Framework Stabilization'
       }
     },
     { 
       id: '5',
-      url: null, 
+      url: '', 
       type: 'fbx', 
-      title: 'Evergreen Vitality',
-      description: 'The harmonious dance of experience and joy.',
+      title: 'Neural Pivot 05',
+      description: 'Long-term equilibrium and seasoned stability.',
       modelPath: '',
       stats: {
         gender: 'Female',
-        age: 65,
-        mentality: { initial: '0.9', final: '0.95' },
-        direction: { initial: '0.3', final: '0.1' },
-        motivation: { initial: '0.25', final: '0.0' },
-        social: { initial: '0.8', final: '0.9' },
-        description: 'Late Life Vitality'
+        age: 55,
+        mentality: { initial: '0.85', final: '0.98' },
+        direction: { initial: '0.9', final: '1.0' },
+        motivation: { initial: '0.5', final: '0.7' },
+        social: { initial: '0.8', final: '0.95' },
+        description: 'Mature Equilibrium'
       }
     },
   ]);
@@ -198,19 +198,38 @@ export default function App() {
     }
     
     if (extension === 'fbx') {
-      try {
-        const url = URL.createObjectURL(file);
-        const newSlots = [...slots];
-        newSlots[selectedSlot - 1] = { 
-          ...newSlots[selectedSlot - 1],
-          url, 
-          type: 'fbx' 
-        };
-        setSlots(newSlots);
-      } catch (err) {
-        setError("Failed to create file URL.");
-        setIsLoading(false);
-      }
+      const currentSlot = slots[selectedSlot - 1];
+      
+      // We wrap the upload in an async function inside the callback
+      const performUpload = async () => {
+        try {
+          // 1. Upload to Firebase Storage
+          const downloadUrl = await uploadModel(file, currentSlot.id);
+          
+          // 2. Update Firestore so other users see it too
+          await updateSlot({
+            ...currentSlot,
+            modelPath: downloadUrl
+          });
+          
+          // 3. Update local state for immediate feedback
+          const newSlots = [...slots];
+          newSlots[selectedSlot - 1] = { 
+            ...newSlots[selectedSlot - 1],
+            url: downloadUrl,
+            modelPath: downloadUrl,
+            type: 'fbx' 
+          };
+          setSlots(newSlots);
+        } catch (err: any) {
+          console.error("Upload error:", err);
+          setError(err.message || "Upload failed. Make sure Storage is activated in Firebase Console.");
+          setIsLoading(false);
+          if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+        }
+      };
+
+      performUpload();
     } else {
       setError(`Unsupported file type: .${extension}. Please use .fbx.`);
       setIsLoading(false);

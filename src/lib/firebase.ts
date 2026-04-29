@@ -1,11 +1,13 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer, collection, getDocs, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
 export async function testConnection() {
@@ -105,4 +107,10 @@ export function subscribeToSlots(callback: (slots: SlotConfig[]) => void) {
   }, (error) => {
     handleFirestoreError(error, OperationType.GET, path);
   });
+}
+
+export async function uploadModel(file: File, slotId: string): Promise<string> {
+  const fileRef = ref(storage, `models/slot_${slotId}_${Date.now()}.fbx`);
+  await uploadBytes(fileRef, file);
+  return await getDownloadURL(fileRef);
 }
