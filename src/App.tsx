@@ -20,85 +20,85 @@ export default function App() {
       id: '1',
       url: '/models/NO2FBX.fbx', 
       type: 'fbx', 
-      title: '神经枢轴 01',
-      description: '初期结构适应阶段，神经连接正在初步构建。',
+      title: 'Neural Pivot 01',
+      description: 'Early structural adaptation stage; neural connections are being established.',
       modelPath: '/models/NO2FBX.fbx',
       stats: {
-        gender: '女',
+        gender: 'Female',
         age: 28,
         mentality: { initial: '0.1', final: '0.4' },
         direction: { initial: '0.5', final: '0.8' },
         motivation: { initial: '0.6', final: '0.9' },
         social: { initial: '0.2', final: '0.5' },
-        description: '模型 NO2FBX - 初始适应期'
+        description: 'Model NO2FBX - Initial adaptation'
       }
     },
     { 
       id: '2',
       url: '/models/NO4FBX.fbx', 
       type: 'fbx', 
-      title: '神经枢轴 02',
-      description: '二级结构细化与增长，系统稳定性提升。',
+      title: 'Neural Pivot 02',
+      description: 'Secondary refinement and growth; system stability improves.',
       modelPath: '/models/NO4FBX.fbx',
       stats: {
-        gender: '男',
+        gender: 'Male',
         age: 32,
         mentality: { initial: '0.3', final: '0.6' },
         direction: { initial: '0.4', final: '0.7' },
         motivation: { initial: '0.5', final: '0.8' },
         social: { initial: '0.3', final: '0.6' },
-        description: '模型 NO4FBX - 精炼阶段'
+        description: 'Model NO4FBX - Refinement stage'
       }
     },
     { 
       id: '3',
       url: '/models/NO5FBX.fbx', 
       type: 'fbx', 
-      title: '神经枢轴 03',
-      description: '结构整合的峰值，神经网络达到高度协同。',
+      title: 'Neural Pivot 03',
+      description: 'Integration peak; the neural network reaches high synergy.',
       modelPath: '/models/NO5FBX.fbx',
       stats: {
-        gender: '女',
+        gender: 'Female',
         age: 38,
         mentality: { initial: '0.5', final: '0.8' },
         direction: { initial: '0.6', final: '0.9' },
         motivation: { initial: '0.7', final: '0.95' },
         social: { initial: '0.5', final: '0.75' },
-        description: '模型 NO5FBX - 整合峰值期'
+        description: 'Model NO5FBX - Integration peak'
       }
     },
     { 
       id: '4',
       url: '/models/NO8FBX.fbx', 
       type: 'fbx', 
-      title: '神经枢轴 04',
-      description: '神经框架趋于稳定，系统进入长期运行状态。',
+      title: 'Neural Pivot 04',
+      description: 'Framework stabilizes; the system enters long-term operation.',
       modelPath: '/models/NO8FBX.fbx',
       stats: {
-        gender: '男',
+        gender: 'Male',
         age: 45,
         mentality: { initial: '0.7', final: '0.9' },
         direction: { initial: '0.8', final: '0.95' },
         motivation: { initial: '0.6', final: '0.8' },
         social: { initial: '0.7', final: '0.85' },
-        description: '模型 NO8FBX - 框架巩固期'
+        description: 'Model NO8FBX - Consolidation stage'
       }
     },
     { 
       id: '5',
       url: '/models/NO9FBX.fbx', 
       type: 'fbx', 
-      title: '神经枢轴 05',
-      description: '长期平衡与经验沉淀完成，达到高阶稳定性。',
+      title: 'Neural Pivot 05',
+      description: 'Long-term balance and accumulated experience yield high stability.',
       modelPath: '/models/NO9FBX.fbx',
       stats: {
-        gender: '女',
+        gender: 'Female',
         age: 55,
         mentality: { initial: '0.85', final: '0.98' },
         direction: { initial: '0.9', final: '1.0' },
         motivation: { initial: '0.5', final: '0.7' },
         social: { initial: '0.8', final: '0.95' },
-        description: '模型 NO9FBX - 成熟平衡期'
+        description: 'Model NO9FBX - Mature balance'
       }
     },
   ]);
