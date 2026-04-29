@@ -18,11 +18,11 @@ export default function App() {
   const [slots, setSlots] = useState<SlotConfig[]>([
     { 
       id: '1',
-      url: '', 
+      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO2FBX.fbx'), 
       type: 'fbx', 
       title: 'Neural Pivot 01',
       description: 'The first stage of intense structural adaptation.',
-      modelPath: '',
+      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO2FBX.fbx',
       stats: {
         gender: 'Female',
         age: 28,
@@ -30,16 +30,16 @@ export default function App() {
         direction: { initial: '0.5', final: '0.8' },
         motivation: { initial: '0.6', final: '0.9' },
         social: { initial: '0.2', final: '0.5' },
-        description: 'Initial Adaptation Phase'
+        description: 'Model NO2FBX - Initial Adaptation Phase'
       }
     },
     { 
       id: '2',
-      url: '', 
+      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO4FBX.fbx'), 
       type: 'fbx', 
       title: 'Neural Pivot 02',
       description: 'Secondary structural refinement and growth.',
-      modelPath: '',
+      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO4FBX.fbx',
       stats: {
         gender: 'Male',
         age: 32,
@@ -47,16 +47,16 @@ export default function App() {
         direction: { initial: '0.4', final: '0.7' },
         motivation: { initial: '0.5', final: '0.8' },
         social: { initial: '0.3', final: '0.6' },
-        description: 'Refinement Stage'
+        description: 'Model NO4FBX - Refinement Stage'
       }
     },
     { 
       id: '3',
-      url: '', 
+      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO5FBX.fbx'), 
       type: 'fbx', 
       title: 'Neural Pivot 03',
       description: 'The peak of structural integration.',
-      modelPath: '',
+      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO5FBX.fbx',
       stats: {
         gender: 'Female',
         age: 38,
@@ -64,16 +64,16 @@ export default function App() {
         direction: { initial: '0.6', final: '0.9' },
         motivation: { initial: '0.7', final: '0.95' },
         social: { initial: '0.5', final: '0.75' },
-        description: 'Peak Integration'
+        description: 'Model NO5FBX - Peak Integration'
       }
     },
     { 
       id: '4',
-      url: '', 
+      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO8FBX.fbx'), 
       type: 'fbx', 
       title: 'Neural Pivot 04',
       description: 'Stabilizing the neural framework.',
-      modelPath: '',
+      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO8FBX.fbx',
       stats: {
         gender: 'Male',
         age: 45,
@@ -81,16 +81,16 @@ export default function App() {
         direction: { initial: '0.8', final: '0.95' },
         motivation: { initial: '0.6', final: '0.8' },
         social: { initial: '0.7', final: '0.85' },
-        description: 'Framework Stabilization'
+        description: 'Model NO8FBX - Framework Stabilization'
       }
     },
     { 
       id: '5',
-      url: '', 
+      url: normalizeUrl('https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO9FBX.fbx'), 
       type: 'fbx', 
       title: 'Neural Pivot 05',
       description: 'Long-term equilibrium and seasoned stability.',
-      modelPath: '',
+      modelPath: 'https://github.com/SNWJ8585/InterimModelWbsite/blob/main/public/models/NO9FBX.fbx',
       stats: {
         gender: 'Female',
         age: 55,
@@ -98,7 +98,7 @@ export default function App() {
         direction: { initial: '0.9', final: '1.0' },
         motivation: { initial: '0.5', final: '0.7' },
         social: { initial: '0.8', final: '0.95' },
-        description: 'Mature Equilibrium'
+        description: 'Model NO9FBX - Mature Equilibrium'
       }
     },
   ]);
