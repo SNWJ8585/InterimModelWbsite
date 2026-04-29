@@ -1,6 +1,6 @@
 ﻿import React, { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, useFBX, PerspectiveCamera, Html, Float } from '@react-three/drei';
+import { OrbitControls, ContactShadows, useFBX, PerspectiveCamera, Html, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Compass, TrendingUp, Users, ChevronRight } from 'lucide-react';
@@ -373,7 +373,6 @@ export default function ModelViewer({ url, fallbackUrl, onLoaded, onError, stats
         <pointLight position={[0, 12, 0]} intensity={1.5} distance={25} />
         
         <Suspense fallback={<ModelLoadingIndicator />}>
-          <Environment preset="city" />
           <ModelErrorBoundary onError={handleBoundaryError} resetKey={activeUrl}>
             <group position={[0, -0.6, 0]}>
               {activeUrl ? (
